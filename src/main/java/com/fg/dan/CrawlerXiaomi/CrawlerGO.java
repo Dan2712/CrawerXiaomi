@@ -1,6 +1,7 @@
 package com.fg.dan.CrawlerXiaomi;
 
 import java.io.File;
+import java.util.List;
 import java.util.Set;
 
 import org.openqa.selenium.By;
@@ -13,7 +14,7 @@ import org.openqa.selenium.chrome.ChromeDriver;
  * Dan
  *
  */
-public class App 
+public class CrawlerGO 
 {
     public static void main( String[] args )
     {
@@ -45,8 +46,12 @@ public class App
 		}
         System.out.println(webDriver.getCurrentUrl());
         
-        WebElement webElement = webDriver.findElement(By.xpath("/html"));
-        System.out.println(webElement.getAttribute("outerHTML"));
-//        webDriver.close();
+        List<WebElement> elements = webDriver.findElements(By.className("topic-pp"));
+        for(int i=0; i<elements.size(); i++) {
+//        	WebElement element = elements.get(i).findElement(By.tagName("p"));
+        	System.out.println(elements.get(i).getText());
+        }
+//        System.out.println(webElement.getAttribute("outerHTML"));
+        webDriver.close();
     }
 }
