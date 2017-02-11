@@ -7,6 +7,7 @@ import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
+import java.text.DateFormat;
 import java.util.Date;
 import java.util.List;
 import java.util.Set;
@@ -14,6 +15,7 @@ import java.util.StringTokenizer;
 
 import org.openqa.selenium.By;
 import org.openqa.selenium.Cookie;
+import org.openqa.selenium.NoSuchElementException;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.chrome.ChromeDriver;
@@ -26,11 +28,11 @@ public class CrawlerGO
 {
     public static void main( String[] args )
     {
-    	System.getProperties().setProperty("webdriver.chrome.driver", "E:" + File.separator + "psnl" + File.separator + "chromedriver.exe");
+//    	System.getProperties().setProperty("webdriver.chrome.driver", "E:" + File.separator + "psnl" + File.separator + "chromedriver.exe");
         WebDriver webDriver = new ChromeDriver();
+        String URL = "https://wx.xiaomiquan.com/dweb/#/login";
+        webDriver.navigate().to(URL);
         loadCookie(webDriver);
-        webDriver.get("https://wx.xiaomiquan.com/dweb/#/login");
-        webDriver.switchTo().defaultContent();
         try {	   
             while (true) {
                 Thread.sleep(500L);
@@ -45,11 +47,20 @@ public class CrawlerGO
         }
         
 //        storeCookie(webDriver);
-        List<WebElement> elements = webDriver.findElements(By.className("topic-pp"));
+        
+        List<WebElement> elements = webDriver.findElements(By.className("topic_element"));
         for(int i=0; i<elements.size(); i++) {
-        	System.out.println(elements.get(i).getText());
+        	WebElement user_info = elements.get(i).findElement(By.className("user_name"));
+        	System.out.println("Name: " + user_info.getText());
+        	try {
+        		WebElement topic = elements.get(i).findElement(By.className("topic-pp"));
+            	System.out.println("Content: " + topic.getText() + "\n");
+        	} catch (NoSuchElementException e) {
+        		System.out.println("Content: No Content" + "\n");
+        	}
         }
-//        System.out.println(webElement.getAttribute("outerHTML"));
+//        WebElement element = webDriver.findElement(By.xpath("/html"));
+//        System.out.println(element.getAttribute("outerHTML"));
         webDriver.close();
     }
     
@@ -77,7 +88,7 @@ public class CrawlerGO
         return cookies;
     }
     
-    private static WebDriver loadCookie(WebDriver webDriver) {
+    private static void loadCookie(WebDriver webDriver) {
     	File file = new File("Cookie.data");							
         FileReader fileReader = null;
 		try {
@@ -95,9 +106,10 @@ public class CrawlerGO
 					String path = tokens.nextToken();
 					
 					Date expiry = null;
-					String val;			
-			        if(!(val=tokens.nextToken()).equals("null"))	
+					String val;		
+			        if(!(val=tokens.nextToken()).equals("null")) {
 			        	expiry = new Date(val);					
+			        }
 			        Boolean isSecure = new Boolean(tokens.nextToken());
 			        
 			        Cookie ck = new Cookie(name, value, domain, path, expiry, isSecure);
@@ -110,6 +122,6 @@ public class CrawlerGO
 			e.printStackTrace();
 		}							
 		
-        return webDriver;
+		webDriver.navigate().refresh();
     }
 }
